@@ -16,8 +16,10 @@ import {
 } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { navItems } from "./Header";
+import { auth } from "@clerk/nextjs";
 
 export default function MenuDrawer() {
+  const { userId } = auth();
   return (
     <Drawer direction="right">
       <DrawerTrigger asChild>
@@ -29,7 +31,9 @@ export default function MenuDrawer() {
         <DrawerHeader>
           <div className="flex items-center justify-between">
             <div>
-              <DrawerTitle className="text-2xl">MeetEasy</DrawerTitle>
+              <DrawerTitle className="text-2xl text-start">
+                MeetEasy
+              </DrawerTitle>
               <DrawerDescription>
                 Simplify Your{" "}
                 <span className="text-violet-400 font-bold">Schedule</span>,

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MenuDrawer from "./MenuDrawer";
 import MenuToggle from "./MenuToggle";
+import { UserButton, auth, currentUser } from "@clerk/nextjs";
 
 export const navItems = [
   {
@@ -21,7 +22,11 @@ export const navItems = [
   },
 ];
 
-export default function Header() {
+export default async function Header() {
+  const { userId } = auth();
+  console.log("userId", userId);
+  const user = await currentUser();
+
   return (
     <header className="flex justify-between items-center px-10 py-5">
       <div>
@@ -38,12 +43,26 @@ export default function Header() {
           })}
         </ul>
         <div className="space-x-5 flex items-center">
-          <Button>Login</Button>
-          <Button variant={"outline"}>Create an account</Button>
+          {userId ? (
+            <div>
+              <UserButton />
+            </div>
+          ) : (
+            <div className="flex items-center gap-x-4">
+              <Button asChild>
+                <Link href={"/sign-in"}>Login</Link>
+              </Button>
+              <Button variant={"outline"} asChild>
+                <Link href={"/sign-up"}>Create an account</Link>
+              </Button>
+            </div>
+          )}
+
           <MenuToggle />
         </div>
       </div>
-      <div className="md:hidden flex gap-x-4">
+      <div className="md:hidden flex items-center gap-x-4">
+        {userId && <UserButton />}
         <MenuToggle />
         <MenuDrawer />
       </div>
