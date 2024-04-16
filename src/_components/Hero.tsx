@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
+import { auth } from "@clerk/nextjs";
 import Image from "next/image";
-import { FaGoogle } from "react-icons/fa";
+import Link from "next/link";
+import { FaLongArrowAltRight } from "react-icons/fa";
 import { IoMail } from "react-icons/io5";
+import { SlCalender } from "react-icons/sl";
 
 export const heroImages = [
   {
@@ -27,6 +30,7 @@ export const heroImages = [
 ];
 
 export default function Hero() {
+  const { userId } = auth();
   return (
     <div className="min-h-[90vh] w-full flex items-center justify-center p-10 relative">
       <div>
@@ -56,16 +60,33 @@ export default function Hero() {
           emails
           <br /> to find the perfect time -- and so much more.
         </h4>
-        <div className="flex gap-x-6">
-          <Button className="bg-violet-500 hover:bg-violet-600 dark:text-white flex items-center gap-x-2">
-            <FaGoogle />
-            Continue with Google
-          </Button>
-          <Button className="flex items-center gap-x-2">
-            <IoMail />
-            Continue with Email
-          </Button>
-        </div>
+        {!userId ? (
+          <div className="flex gap-x-6">
+            <Button className="bg-violet-500 hover:bg-violet-600 dark:text-white flex items-center gap-x-2">
+              Get Started
+              <FaLongArrowAltRight />
+            </Button>
+
+            <Button className="flex items-center gap-x-2" asChild>
+              <Link href={"/sign-up"}>
+                <IoMail />
+                Continue with Email
+              </Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-x-6">
+            <Button
+              className="bg-violet-500 hover:bg-violet-600 dark:text-white flex items-center gap-x-2"
+              asChild
+            >
+              <Link href={"/create-meeting"}>
+                Schedule a Meeting
+                <SlCalender />
+              </Link>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
