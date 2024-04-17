@@ -80,7 +80,7 @@ export default function Hero() {
               className="bg-violet-500 hover:bg-violet-600 dark:text-white flex items-center gap-x-2"
               asChild
             >
-              <Link href={"/create-meeting"}>
+              <Link href={"/create"}>
                 Schedule a Meeting
                 <SlCalender />
               </Link>

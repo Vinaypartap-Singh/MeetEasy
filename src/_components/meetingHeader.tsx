@@ -12,7 +12,7 @@ export default function MeetingHeader() {
             <h5>Cancel</h5>
           </Link>
         </Button>
-        <h1 className="capitalize text-3xl border-b-2 pb-4">
+        <h1 className="capitalize text-3xl border-b-2 pb-4 mt-10">
           Create a meeting
         </h1>
       </div>

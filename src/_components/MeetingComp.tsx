@@ -1,7 +1,6 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-
 import MeetingHeader from "./meetingHeader";
 import {
   DropdownMenu,
@@ -10,12 +9,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { title } from "process";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Calendar } from "@/components/ui/calendar";
 
 export default function MeetingPageComponenet() {
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [formValue, setFormvalue] = useState();
+
+  // UseStates
+  const [timeSlot, setTimeSlots] = useState<Array<string>>();
+  const [eventName, setEventName] = useState<string>();
+  const [duration, setDuration] = useState<number>(15);
+  const [locationName, setLocationName] = useState<string>();
+  const [meetUrl, setMeetURL] = useState<string>();
+
+  useEffect(() => {
+    duration && createTimeSlot(duration);
+  }, [duration]);
+
   const timeOptions = [
     {
       time: 15,
@@ -50,13 +63,42 @@ export default function MeetingPageComponenet() {
     },
   ];
 
+  const createTimeSlot = (interval: number) => {
+    const startTime = 8 * 60; // 8 AM in minutes
+    const endTime = 22 * 60; // 10 PM in minutes
+    const totalSlots = (endTime - startTime) / interval;
+    const slots = Array.from({ length: totalSlots }, (_, i) => {
+      const totalMinutes = startTime + i * interval;
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      const formattedHours = hours > 12 ? hours - 12 : hours; // Convert to 12-hour format
+      const period = hours >= 12 ? "PM" : "AM";
+      return `${String(formattedHours).padStart(2, "0")}:${String(
+        minutes
+      ).padStart(2, "0")} ${period}`;
+    });
+
+    setTimeSlots(slots);
+  };
+
+  const createMeeting = () => {
+    setFormvalue({
+      eventName: eventName,
+      duration: duration,
+      locationName: locationName,
+      meetUrl: meetUrl,
+    });
+
+    console.log(formValue);
+  };
+
   return (
     <div>
       <MeetingHeader />
       <div className="max-w-3xl px-10 space-y-6 m-auto mt-10">
         <div className="space-y-3">
           <h3 className="text-lg">Event Name *</h3>
-          <Input />
+          <Input onChange={(e) => setEventName(e.target.value)} />
         </div>
         <div className="space-y-3">
           <h3 className="text-lg">Duration *</h3>
@@ -71,6 +113,7 @@ export default function MeetingPageComponenet() {
                 return (
                   <>
                     <Button
+                      onClick={() => setDuration(time)}
                       key={index}
                       variant={"ghost"}
                       className="w-full text-center"
@@ -90,6 +133,7 @@ export default function MeetingPageComponenet() {
             {locations.map(({ title, img }, index) => {
               return (
                 <Button
+                  onChange={() => setLocationName(title)}
                   key={index}
                   asChild
                   className={`cursor-pointer hover:text-black ${
@@ -114,12 +158,34 @@ export default function MeetingPageComponenet() {
             })}
           </div>
         </div>
-        <div className="space-y-3">
-          <h3 className="text-lg">Add {selectedLocation} Url *</h3>
-          <Input />
-        </div>
+        {selectedLocation && (
+          <div className="space-y-3">
+            <h3 className="text-lg">Add {selectedLocation} Url *</h3>
+            <Input onChange={(e) => setMeetURL(e.target.value)} />
+            <div className="space-x-2">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                disabled={(date) => date <= new Date()}
+                className="rounded-md border shadow w-fit"
+              />
+              <div
+                className="flex flex-col w-full overflow-auto gap-4 p-4 border"
+                style={{ maxHeight: "300px" }}
+              >
+                {timeSlot?.map((slot) => (
+                  <Button variant={"outline"}>{slot}</Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
         <div>
-          <Button className="bg-violet-600 text-white w-full">
+          <Button
+            className="bg-violet-600 text-white w-full"
+            onClick={createMeeting}
+          >
             Create Meeting
           </Button>
         </div>
