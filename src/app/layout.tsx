@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/_components/Themeprovider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/toaster";
+import NextTopLoader from "nextjs-toploader";
 
 const inter = Jost({ subsets: ["latin"] });
 
@@ -27,6 +28,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <NextTopLoader showSpinner={false} color="#7c3aed" />
             {children}
             <Toaster />
           </ThemeProvider>
