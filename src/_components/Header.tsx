@@ -3,6 +3,8 @@ import Link from "next/link";
 import MenuDrawer from "./MenuDrawer";
 import MenuToggle from "./MenuToggle";
 import { UserButton, auth } from "@clerk/nextjs";
+import { title } from "process";
+import { url } from "inspector";
 
 export const navItems = [
   {
@@ -14,6 +16,11 @@ export const navItems = [
     id: 2,
     title: "Your Meetings",
     url: "/meetings",
+  },
+  {
+    id: 3,
+    title: "Availability",
+    url: "/availability",
   },
   {
     id: 3,
