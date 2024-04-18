@@ -9,6 +9,7 @@ import { useAuth } from "@clerk/nextjs";
 import DayList from "@/utils/DayList";
 import Header from "@/_components/Header";
 import { useToast } from "@/components/ui/use-toast";
+import MeetingHeader from "@/_components/meetingHeader";
 
 function Availability() {
   const { userId } = useAuth();
@@ -71,6 +72,7 @@ function Availability() {
 
   return (
     <>
+      <MeetingHeader headingTitle="Your Availability" btnText="Go Back" />
       <div className="p-10 max-w-5xl m-auto">
         <h2 className="font-bold text-2xl">Availability</h2>
         <hr className="my-7"></hr>
