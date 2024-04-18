@@ -16,6 +16,7 @@ import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Header from "./Header";
 
 interface fromValueInterface {
   eventName?: string | undefined;
@@ -200,8 +201,8 @@ export default function MeetingPageComponenet() {
                   asChild
                   className={`cursor-pointer hover:text-black ${
                     formValue?.locationName === title
-                      ? "bg-violet-200"
-                      : "bg-transparent text-white border"
+                      ? "bg-gray-100 text-black dark:bg-violet-200 dark:text-white dark:hover:bg-violet-400 hover:bg-gray-200"
+                      : "bg-transparent text-black dark:text-white border hover:bg-gray-100"
                   }`}
                   onClick={() =>
                     setFormvalue({ ...formValue, locationName: title })
@@ -224,7 +225,7 @@ export default function MeetingPageComponenet() {
         </div>
         {formValue?.locationName && (
           <div className="space-y-3">
-            <h3 className="text-lg">Add {selectedLocation} Url *</h3>
+            <h3 className="text-lg">Add {formValue?.locationName} Url *</h3>
             <Input
               onChange={(e) =>
                 setFormvalue({ ...formValue, meetUrl: e.target.value })

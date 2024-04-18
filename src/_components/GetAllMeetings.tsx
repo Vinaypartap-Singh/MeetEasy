@@ -118,7 +118,7 @@ export default function GetAllMeetings() {
                     onClick={() => {
                       navigator.clipboard.writeText(data?.meetUrl);
                       toast({
-                        description: "Meeting URL Copied",
+                        title: "Meeting URL Copied",
                       });
                     }}
                   >
