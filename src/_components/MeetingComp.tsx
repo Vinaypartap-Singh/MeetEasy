@@ -12,20 +12,54 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { db } from "../../firebase";
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+
+interface fromValueInterface {
+  eventName?: string | undefined;
+  duration?: number;
+  locationName?: string;
+  meetUrl?: string | undefined;
+  meetingDate?: Date | undefined;
+  timeSlot?: string | undefined;
+}
 
 export default function MeetingPageComponenet() {
+  const router = useRouter();
+  const { userId } = useAuth();
   const [selectedLocation, setSelectedLocation] = useState("");
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [formValue, setFormvalue] = useState();
+  const [formValue, setFormvalue] = useState<fromValueInterface>({
+    duration: 15,
+  });
 
   // UseStates
   const [timeSlot, setTimeSlots] = useState<Array<string>>();
   const [eventName, setEventName] = useState<string>();
   const [duration, setDuration] = useState<number>(15);
   const [meetUrl, setMeetURL] = useState<string>();
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>();
 
   useEffect(() => {
     duration && createTimeSlot(duration);
+
+    const checkIfUserAlreadyExistInDB = async () => {
+      const docRef = doc(db, "users", `${userId}`);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        console.log("OK");
+      } else {
+        await setDoc(docRef, {
+          meetings: [],
+          userId: userId,
+        });
+      }
+    };
+
+    checkIfUserAlreadyExistInDB();
   }, [duration]);
 
   const timeOptions = [
@@ -80,41 +114,69 @@ export default function MeetingPageComponenet() {
     setTimeSlots(slots);
   };
 
-  const createMeeting = () => {
-    console.log(eventName);
+  const createMeeting = async () => {
     setFormvalue({
       eventName: eventName,
       duration: duration,
       locationName: selectedLocation,
       meetUrl: meetUrl,
-      date: date,
+      meetingDate: date,
+      timeSlot: selectedTimeSlot,
     });
 
     console.log(formValue);
+
+    const docRef = doc(db, "users", `${userId}`);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const existingMeetings = docSnap.data().meetings || [];
+
+      existingMeetings.push(formValue);
+
+      if (formValue) {
+        await setDoc(
+          docRef,
+          {
+            meetings: existingMeetings,
+          },
+          { merge: true }
+        );
+        router.push("/meetings");
+      } else {
+        console.log(formValue);
+      }
+    }
   };
 
   return (
     <div>
-      <MeetingHeader />
+      <MeetingHeader headingTitle="Create a Meeting" btnText="Go Back" />
       <div className="max-w-3xl px-10 space-y-6 m-auto mt-10">
         <div className="space-y-3">
           <h3 className="text-lg">Event Name *</h3>
-          <Input onChange={(e) => setEventName(e.target.value)} />
+          <Input
+            onChange={(e) =>
+              setFormvalue({ ...formValue, eventName: e.target.value })
+            }
+          />
         </div>
         <div className="space-y-3">
           <h3 className="text-lg">Duration *</h3>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="px-16">
-                {duration} Min
+                {formValue?.duration} Min
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               {timeOptions.map(({ time }, index) => {
                 return (
-                  <>
+                  <div key={index}>
                     <Button
-                      onClick={() => setDuration(time)}
+                      onClick={() =>
+                        setFormvalue({ ...formValue, duration: time })
+                      }
                       key={index}
                       variant={"ghost"}
                       className="w-full text-center"
@@ -122,7 +184,7 @@ export default function MeetingPageComponenet() {
                       {time} Min
                     </Button>
                     <DropdownMenuSeparator />
-                  </>
+                  </div>
                 );
               })}
             </DropdownMenuContent>
@@ -137,11 +199,13 @@ export default function MeetingPageComponenet() {
                   key={index}
                   asChild
                   className={`cursor-pointer hover:text-black ${
-                    selectedLocation === title
+                    formValue?.locationName === title
                       ? "bg-violet-200"
                       : "bg-transparent text-white border"
                   }`}
-                  onClick={() => setSelectedLocation(title)}
+                  onClick={() =>
+                    setFormvalue({ ...formValue, locationName: title })
+                  }
                 >
                   <div className="space-x-3">
                     <Image
@@ -158,10 +222,14 @@ export default function MeetingPageComponenet() {
             })}
           </div>
         </div>
-        {selectedLocation && (
+        {formValue?.locationName && (
           <div className="space-y-3">
             <h3 className="text-lg">Add {selectedLocation} Url *</h3>
-            <Input onChange={(e) => setMeetURL(e.target.value)} />
+            <Input
+              onChange={(e) =>
+                setFormvalue({ ...formValue, meetUrl: e.target.value })
+              }
+            />
             <div className="space-x-2 flex">
               <Calendar
                 mode="single"
@@ -169,13 +237,26 @@ export default function MeetingPageComponenet() {
                 onSelect={setDate}
                 disabled={(date) => date <= new Date()}
                 className="rounded-md border shadow w-fit"
+                onDayClick={() =>
+                  setFormvalue({ ...formValue, meetingDate: date })
+                }
               />
               <div
                 className="flex flex-col w-full overflow-auto gap-4 p-4 border"
                 style={{ maxHeight: "300px" }}
               >
-                {timeSlot?.map((slot) => (
-                  <Button variant={"outline"}>{slot}</Button>
+                {timeSlot?.map((slot, index) => (
+                  <Button
+                    key={index}
+                    onClick={() =>
+                      setFormvalue({ ...formValue, timeSlot: slot })
+                    }
+                    variant={
+                      formValue?.timeSlot === slot ? "default" : "outline"
+                    }
+                  >
+                    {slot}
+                  </Button>
                 ))}
               </div>
             </div>
@@ -183,7 +264,7 @@ export default function MeetingPageComponenet() {
         )}
         <div>
           <Button
-            className="bg-violet-600 text-white w-full"
+            className="bg-violet-600 hover:bg-violet-900 text-white w-full"
             onClick={createMeeting}
           >
             Create Meeting

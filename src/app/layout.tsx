@@ -3,6 +3,7 @@ import { Inter, Jost } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/_components/Themeprovider";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Jost({ subsets: ["latin"] });
 
@@ -27,6 +28,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
+            <Toaster />
           </ThemeProvider>
         </body>
       </html>

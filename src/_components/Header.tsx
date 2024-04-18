@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MenuDrawer from "./MenuDrawer";
 import MenuToggle from "./MenuToggle";
-import { UserButton, auth, currentUser } from "@clerk/nextjs";
+import { UserButton, auth } from "@clerk/nextjs";
 
 export const navItems = [
   {
