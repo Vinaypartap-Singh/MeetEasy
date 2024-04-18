@@ -12,8 +12,8 @@ export const navItems = [
   },
   {
     id: 2,
-    title: "Pricing",
-    url: "/pricing",
+    title: "Your Meetings",
+    url: "/meetings",
   },
   {
     id: 3,
@@ -24,8 +24,6 @@ export const navItems = [
 
 export default async function Header() {
   const { userId } = auth();
-  console.log("userId", userId);
-  const user = await currentUser();
 
   return (
     <header className="flex justify-between items-center px-10 py-5">

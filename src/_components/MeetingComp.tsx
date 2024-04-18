@@ -22,7 +22,6 @@ export default function MeetingPageComponenet() {
   const [timeSlot, setTimeSlots] = useState<Array<string>>();
   const [eventName, setEventName] = useState<string>();
   const [duration, setDuration] = useState<number>(15);
-  const [locationName, setLocationName] = useState<string>();
   const [meetUrl, setMeetURL] = useState<string>();
 
   useEffect(() => {
@@ -82,11 +81,13 @@ export default function MeetingPageComponenet() {
   };
 
   const createMeeting = () => {
+    console.log(eventName);
     setFormvalue({
       eventName: eventName,
       duration: duration,
-      locationName: locationName,
+      locationName: selectedLocation,
       meetUrl: meetUrl,
+      date: date,
     });
 
     console.log(formValue);
@@ -105,7 +106,7 @@ export default function MeetingPageComponenet() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="px-16">
-                15 Min
+                {duration} Min
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
@@ -133,7 +134,6 @@ export default function MeetingPageComponenet() {
             {locations.map(({ title, img }, index) => {
               return (
                 <Button
-                  onChange={() => setLocationName(title)}
                   key={index}
                   asChild
                   className={`cursor-pointer hover:text-black ${
@@ -162,7 +162,7 @@ export default function MeetingPageComponenet() {
           <div className="space-y-3">
             <h3 className="text-lg">Add {selectedLocation} Url *</h3>
             <Input onChange={(e) => setMeetURL(e.target.value)} />
-            <div className="space-x-2">
+            <div className="space-x-2 flex">
               <Calendar
                 mode="single"
                 selected={date}
